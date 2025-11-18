@@ -61,7 +61,7 @@
         align-items: center;
         justify-content: center;
         border-radius: 8px;
-        background: linear-gradient(180deg,#6ac7ec 0%, #4aa8cc 100%);
+        background: linear-gradient(180deg,#FF8DA1 0%, #E67A8F 100%);
         color: white;
         font-weight: bold;
         border: 3px solid rgba(0,0,0,0.12);
@@ -87,7 +87,7 @@
  
     .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg,#6ac7ec 0%, #4a9fc0 100%);
+        background: linear-gradient(90deg,#FF8DA1 0%, #E67A8F 100%);
         width: 0%;
         transition: width 0.3s ease;
     }
@@ -188,7 +188,7 @@
         flex: 1;
         padding: 12px 14px;
         border-radius: 10px;
-        background: linear-gradient(180deg,#6ac7ec 0%, #4aa8cc 100%);
+        background: linear-gradient(180deg,#FF8DA1 0%, #E67A8F 100%);
         color: white;
         font-weight: bold;
         cursor: pointer;
@@ -446,6 +446,7 @@
 
 <!-- Main menu page (same size as app) -->
 <div class="card" id="mainMenuPage" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+  <img src="9533819.png" style="width:80px;height:80px;margin-bottom:15px;" alt="Piggy Bank">
   <h2>Főmenü</h2>
   <p>Üdvözöllek a Smart Money alkalmazásban.</p>
   <div class="menu-actions">
@@ -463,18 +464,25 @@
   <div style="width:100%;padding:0 12px;display:flex;flex-direction:column;align-items:center;">
     <div style="width:100%;display:flex;align-items:center;gap:8px;margin-bottom:10px;">
       <input id="profileName" type="text" placeholder="Neved" style="flex:1;padding:8px;border-radius:6px;border:2px solid rgba(0,0,0,0.06);" disabled />
-      <button onclick="toggleNameEdit()" id="editNameBtn" style="padding:8px 10px;border-radius:6px;background:linear-gradient(180deg,#6ac7ec 0%, #4aa8cc 100%);color:white;font-weight:bold;cursor:pointer;border:2px solid rgba(0,0,0,0.12);">Szerkesztés</button>
+      <button onclick="toggleNameEdit()" id="editNameBtn" style="padding:8px 10px;border-radius:6px;background:linear-gradient(180deg,#FF8DA1 0%, #E67A8F 100%);color:white;font-weight:bold;cursor:pointer;border:2px solid rgba(0,0,0,0.12);">Szerkesztés</button>
     </div>
     <div style="width:100%;display:flex;gap:8px;margin-bottom:14px;">
       <button onclick="saveProfile()" style="flex:1;padding:8px;background:#444;color:white;border:2px solid rgba(0,0,0,0.08);border-radius:6px;cursor:pointer;font-weight:bold;">Mentés</button>
-      <button onclick="closeProfile()" style="flex:1;padding:8px;background:#777;color:white;border:2px solid rgba(0,0,0,0.08);border-radius:6px;cursor:pointer;font-weight:bold;">Mégse</button>
+      <button onclick="openStatistics()" style="flex:1;padding:8px;background:#FF8DA1;color:white;border:2px solid rgba(0,0,0,0.08);border-radius:6px;cursor:pointer;font-weight:bold;">Statisztika</button>
     </div>
 
     <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 0;">
       <label style="font-weight:bold;font-size:14px;">Sötét mód</label>
       <div class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()"></div>
     </div>
+  </div>
+</div>
 
+<!-- Statistics page -->
+<div class="card" id="statisticsPage" style="display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:18px;">
+  <div class="back-button" onclick="closeStatistics()" title="Vissza" style="align-self:flex-start;margin-bottom:10px;">←</div>
+  <h2>Statisztika</h2>
+  <div style="width:100%;padding:0 12px;display:flex;flex-direction:column;align-items:center;">
     <h4 style="width:100%;margin:14px 0 8px 0;text-align:left;">Összegek (mappánként)</h4>
     <canvas id="expensesChart" class="profile-chart" width="280" height="140"></canvas>
 
@@ -482,7 +490,6 @@
     <canvas id="expenseChartProfile" class="profile-chart" width="280" height="140"></canvas>
   </div>
 </div>
-
 <script>
 let balances = {};
 let editing = null;
@@ -723,7 +730,7 @@ function drawExpensesChart() {
         const barH = (percent / 100) * (h - padding*2 - 20);
         const y = h - padding - 20 - barH;
         const grad = ctx.createLinearGradient(x, y, x+barWidth, y);
-        grad.addColorStop(0, '#6ac7ec'); grad.addColorStop(1, '#4a9fc0');
+        grad.addColorStop(0, '#FF8DA1'); grad.addColorStop(1, '#E67A8F');
         ctx.fillStyle = grad;
         ctx.fillRect(x, y, barWidth, barH);
         // percentage text
@@ -757,6 +764,18 @@ function openProfile() {
 function closeProfile() {
     document.getElementById('profilePage').style.display = 'none';
     document.getElementById('appPage').style.display = 'block';
+}
+
+function openStatistics() {
+    document.getElementById('statisticsPage').style.display = 'flex';
+    document.getElementById('profilePage').style.display = 'none';
+    drawExpensesChart();
+    drawExpenseChart();
+}
+
+function closeStatistics() {
+    document.getElementById('statisticsPage').style.display = 'none';
+    document.getElementById('profilePage').style.display = 'flex';
 }
 
 function saveProfile() {
