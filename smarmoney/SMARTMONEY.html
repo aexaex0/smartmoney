@@ -245,24 +245,35 @@
  
     .bottom-buttons {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
+        align-items: center;
         margin-top: 15px;
+        padding: 10px 0;
+        background: white;
+        border-radius: 15px;
     }
  
     .bottom-buttons button {
-        width: 48%;
-        padding: 10px;
+        width: 60px;
+        height: 60px;
+        padding: 0;
         border: none;
-        border-radius: 8px;
-        background: linear-gradient(180deg,#9aa 0%, #888 100%);
-        color: white;
+        border-radius: 50%;
+        background: white;
+        color: black;
         font-weight: bold;
         cursor: pointer;
-        border: 3px solid rgba(0,0,0,0.08);
+        border: none;
+        font-size: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
  
     .bottom-buttons button:hover {
-        background: linear-gradient(180deg,#82c8d4 0%, #666 100%);
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     .menu-actions {
@@ -413,11 +424,13 @@
     }
 
     body.dark-mode .bottom-buttons button {
-        background: linear-gradient(180deg, #3a3f47 0%, #2d3136 100%);
+        background: white;
+        color: black;
     }
 
     body.dark-mode .bottom-buttons button:hover {
-        background: linear-gradient(180deg, #424a52 0%, #353b43 100%);
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     body.dark-mode .modal-content button {
@@ -478,8 +491,8 @@
     </div>
  
     <div class="bottom-buttons">
-<button onclick="openAddMoneyModal()">Pénz feltöltése</button>
-</div>
+        <button onclick="openAddMoneyModal()">+</button>
+    </div>
 </div>
  
 <!-- Modals -->
