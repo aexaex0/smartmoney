@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Money</title>
+<style>
+    body {
+        font-family: "Segoe UI", sans-serif;
+        /* subtle gradient background */
+        background: linear-gradient(180deg, #cfcfcf 0%, #bdbdbd 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        position: relative;
+        overflow: hidden;
+    }
+
+    body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 60px 70px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 50px 50px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 90px 10px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 10px 90px, #f0f0f0, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 140px 40px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 70px 150px, #fff, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 160px 120px, #ddd, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 30px 160px, #fff, rgba(0,0,0,0));
+        background-repeat: repeat;
+        background-size: 200px 200px;
+        animation: twinkle 5s infinite;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+
+    @keyframes shootingStar {
+        0% { transform: translateX(-100px) translateY(-100px); opacity: 1; }
+        100% { transform: translateX(100vw) translateY(100vh); opacity: 0; }
+    }
+
+    body::after {
+        content: '';
+        position: absolute;
+        top: -50px;
+        left: -50px;
+        width: 4px;
+        height: 4px;
+        background: radial-gradient(circle, #fff, rgba(255,255,255,0.5));
+        border-radius: 50%;
+        box-shadow: 0 0 6px rgba(255,255,255,0.8);
+        animation: shootingStar 3s ease-in infinite;
+        pointer-events: none;
+    }
+
+    body.dark-mode::after {
+        background: radial-gradient(circle, #aaa, rgba(170,170,170,0.5));
+        box-shadow: 0 0 6px rgba(170,170,170,0.8);
+    }
+
+    body.dark-mode::before {
+        background: 
+            radial-gradient(2px 2px at 20px 30px, #555, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 60px 70px, #777, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 50px 50px, #666, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 130px 80px, #555, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 90px 10px, #777, rgba(0,0,0,0));
+        background-repeat: repeat;
+        background-size: 200px 200px;
+    }
+ 
+    .card {
+        background: linear-gradient(180deg, #ffffff 0%, #f3f7fb 100%);
+        width: 360px;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 3px solid rgba(0,0,0,0.06);
+        position: relative;
+        z-index: 10;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .card::-webkit-scrollbar {
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        .card {
+            width: 485px;
+        }
+    }
+ 
+    .user {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+ 
+    .user-icon {
+        width: 35px;
+        height: 35px;
+        background: #ccc;
+        border-radius: 50%;
+        background-image: url('smarmone.png');
+        background-size: 120%;
+        background-position: center;
+        background-repeat: no-repeat;
+        border: 3px solid rgba(0,0,0,0.08); /* subtle dark ring */
+        cursor: pointer; /* clickable icons */
+        display: inline-block;
+        line-height: 0;
+    }
+
+    .back-button {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: linear-gradient(180deg,#FF8DA1 0%, #E67A8F 100%);
+        color: white;
+        font-weight: bold;
+        border: 3px solid rgba(0,0,0,0.12);
+        cursor: pointer;
+    }
+ 
+    .folder {
+        background: linear-gradient(180deg, #fbfdff 0%, #f0f8fb 100%);
+        border-radius: 10px;
+        padding: 12px;
+        margin: 10px 0;
+        border: 2px solid rgba(0,0,0,0.06);
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: #ddd;
+        border-radius: 5px;
+        margin-top: 6px;
+        overflow: hidden;
+        border: 2px solid rgba(0,0,0,0.04);
+    }
+ 
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg,#FF8DA1 0%, #E67A8F 100%);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .progress-fill.exceeded {
+        background: linear-gradient(90deg, #ff6b6b 0%, #ee5a6f 100%);
+    }
+
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(180deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 100;
+        animation: slideIn 0.3s ease, slideOut 0.3s ease 4.7s;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(400px); opacity: 0; }
+    }
+
+    body.dark-mode .notification {
+        background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
+    }
+ 
+    .add-folder {
+        background: transparent;
+        border-radius: 10px;
+        text-align: center;
+        padding: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        border: none;
+        margin-top: 10px;
+    }
+ 
+    .add-folder:hover {
+        opacity: 0.8;
+    }
+
+    .folders-section {
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 10px 0;
+        padding-right: 5px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .folders-section::-webkit-scrollbar {
+        display: none;
+    }
+
+    .expense-button {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg,#ff6b6b 0%, #ee5a6f 100%);
+        color: white;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        border: 2px solid rgba(0,0,0,0.1);
+    }
+    .expense-button:hover { filter: brightness(0.95); }
+ 
+    .bottom-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 15px;
+        padding: 10px 0;
+        background: white;
+        border-radius: 15px;
+    }
+ 
+    .bottom-buttons button {
+        width: 60px;
+        height: 60px;
+        padding: 0;
+        border: none;
+        border-radius: 50%;
+        background: white;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        font-size: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+ 
+    .bottom-buttons button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .menu-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 12px;
+        width: 100%;
+        align-items: center;
+        padding: 0 10px;
+    }
+    .menu-actions button {
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: linear-gradient(180deg,#FF8DA1 0%, #E67A8F 100%);
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        border: 3px solid rgba(0,0,0,0.12);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+        transition: transform 0.12s ease, filter 0.12s ease;
+        width: 100%;
+    }
+    .menu-actions button:hover { filter: brightness(0.95); transform: translateY(-2px); }
+    
+    .menu-actions button.secondary {
+        width: 50%;
+        padding: 8px 12px;
+        font-size: 13px;
+        background: linear-gradient(180deg,#9a9a9a 0%, #777 100%);
+    }
+
+    /* Profile chart */
+    .profile-chart { width: 280px; height: 140px; border-radius: 8px; border: 2px solid rgba(0,0,0,0.06); background: rgba(255,255,255,0.02); }
+
+    /* Modal ablak */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+    }
+
+    .modal-content {
+        background: linear-gradient(180deg,#ffffff 0%, #f6fbff 100%);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        width: 320px;
+        border: 3px solid rgba(0,0,0,0.06);
+    }
+
+    .modal-content input, .modal-content select {
+        width: 80%;
+        padding: 8px;
+        margin: 10px 0;
+        border: 2px solid rgba(0,0,0,0.06);
+        border-radius: 5px;
+    }
+
+    .modal-content button {
+        margin-top: 10px;
+        padding: 8px 15px;
+        border: none;
+        background: #444;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        border: 2px solid rgba(0,0,0,0.08);
+    }
+
+    .modal-content button:hover {
+        background: #222;
+    }
+
+    /* Dark mode */
+    body.dark-mode {
+        background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+        background-attachment: fixed;
+    }
+
+    body.dark-mode::before {
+        background: 
+            radial-gradient(2px 2px at 20px 30px, #555, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 60px 70px, #777, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 50px 50px, #666, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 130px 80px, #555, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 90px 10px, #777, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 10px 90px, #666, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 140px 40px, #777, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 70px 150px, #555, rgba(0,0,0,0)),
+            radial-gradient(1px 1px at 160px 120px, #666, rgba(0,0,0,0)),
+            radial-gradient(2px 2px at 30px 160px, #777, rgba(0,0,0,0));
+        background-repeat: repeat;
+        background-size: 200px 200px;
+        opacity: 1;
+    }
+
+    body.dark-mode .card {
+        background: linear-gradient(180deg, #2f3338 0%, #1f2225 100%);
+        border-color: rgba(255,255,255,0.1);
+    }
+
+    body.dark-mode .card * {
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .folder {
+        background: linear-gradient(180deg, #3a3f47 0%, #2d3136 100%);
+        border-color: rgba(255,255,255,0.08);
+    }
+
+    body.dark-mode .modal-content {
+        background: linear-gradient(180deg, #2d3136 0%, #252a30 100%);
+        border-color: rgba(255,255,255,0.1);
+    }
+
+    body.dark-mode .modal-content input, body.dark-mode .modal-content select {
+        background: #3a3f47;
+        color: #e0e0e0;
+        border-color: rgba(255,255,255,0.1);
+    }
+
+    body.dark-mode .add-folder {
+        background: linear-gradient(180deg, #3a3f47 0%, #2d3136 100%);
+        border-color: rgba(255,255,255,0.08);
+    }
+
+    body.dark-mode .add-folder:hover {
+        background: linear-gradient(180deg, #424a52 0%, #353b43 100%);
+    }
+
+    body.dark-mode .profile-chart {
+        border-color: rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.02);
+    }
+
+    body.dark-mode .modal {
+        background: rgba(0,0,0,0.7);
+    }
+
+    body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode p, body.dark-mode small {
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .bottom-buttons button {
+        background: white;
+        color: black;
+    }
+
+    body.dark-mode .bottom-buttons button:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    body.dark-mode .modal-content button {
+        background: #555;
+    }
+
+    body.dark-mode .modal-content button:hover {
+        background: #666;
+    }
+
+    .dark-mode-toggle {
+        width: 50px;
+        height: 26px;
+        background: #ccc;
+        border-radius: 13px;
+        cursor: pointer;
+        position: relative;
+        border: 2px solid rgba(0,0,0,0.1);
+        transition: background 0.3s ease;
+    }
+
+    .dark-mode-toggle.active {
+        background: #6ac7ec;
+    }
+
+    .dark-mode-toggle::after {
+        content: '';
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        background: white;
+        border-radius: 50%;
+        top: 1px;
+        left: 1px;
+        transition: left 0.3s ease;
+    }
+
+    .dark-mode-toggle.active::after {
+        left: 26px;
+    }
+</style>
+</head>
+<body>
+
+<div class="card" id="appPage" style="display:none;">
+  <div class="user" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="back-button" onclick="openMainMenu()" title="Vissza a menübe">←</div>
+    <div style="flex:1;text-align:center;"><strong id="userName">Hajnal Bálint</strong></div>
+    <div class="user-icon" onclick="openProfile()" title="Profil"></div>
+  </div>
+ 
+    <h2 id="total">Feltöltött: 0 Ft</h2>
+    <h3 id="remaining">Szabad: 0 Ft</h3>
+ 
+    <div class="folders-section">
+        <div id="folders"></div>
+        <div class="add-folder" onclick="openNewFolderModal()">+ Mappa</div>
+    </div>
+ 
+    <div class="bottom-buttons">
+        <button onclick="openAddMoneyModal()">+</button>
+    </div>
+</div>
+ 
+<!-- Modals -->
+<div class="modal" id="addMoneyModal">
+<div class="modal-content">
+<h3>Pénz feltöltése</h3>
+<input type="number" id="moneyAmount" placeholder="Összeg">
+<br>
+<button onclick="addMoney()">Hozzáadás</button>
+<button onclick="closeModal('addMoneyModal')">Mégse</button>
+</div>
+</div>
+
+<!-- Modal: pénz allokálása mappához -->
+<div class="modal" id="allocateMoneyModal">
+<div class="modal-content">
+<h3 id="allocateTitle">Pénz allokálása</h3>
+<input type="number" id="allocateAmount" placeholder="Összeg" min="0">
+<br>
+<button onclick="saveAllocateMoney()">Hozzáadás</button>
+<button onclick="closeModal('allocateMoneyModal')">Mégse</button>
+</div>
+</div>
+ 
+<div class="modal" id="limitModal">
+<div class="modal-content">
+<h3>Új egyenleg</h3>
+<input type="number" id="newLimit" placeholder="Új összeg">
+<br>
+<button onclick="saveNewLimit()">Mentés</button>
+<button onclick="closeModal('limitModal')">Mégse</button>
+</div>
+</div>
+ 
+<div class="modal" id="goalModal">
+<div class="modal-content">
+<h3>Limit beállítása</h3>
+<input type="number" id="newGoal" placeholder="Kívánt limit">
+<br>
+<button onclick="saveGoal()">Mentés</button>
+<button onclick="closeModal('goalModal')">Mégse</button>
+</div>
+</div>
+
+<!-- új modal: cél beállítása kiválasztott mappához -->
+<div class="modal" id="setGoalModal">
+<div class="modal-content">
+<h3>Cél beállítása (válassz mappát)</h3>
+<select id="setGoalFolder"></select>
+<input type="number" id="setGoalAmount" placeholder="Célösszeg">
+<br>
+<button onclick="saveSetGoal()">Mentés</button>
+<button onclick="closeModal('setGoalModal')">Mégse</button>
+</div>
+</div>
+
+<!-- új modal: limit beállítása kiválasztott mappához -->
+<div class="modal" id="setLimitModal">
+<div class="modal-content">
+<h3>Limit beállítása (válassz mappát)</h3>
+<select id="setLimitFolder"></select>
+<input type="number" id="setLimitAmount" placeholder="Új egyenleg">
+<br>
+<button onclick="saveSetLimit()">Mentés</button>
+<button onclick="closeModal('setLimitModal')">Mégse</button>
+</div>
+</div>
+
+<!-- Kiadás modal -->
+<div class="modal" id="expenseModal">
+<div class="modal-content">
+<h3 id="expenseTitle">Kiadás</h3>
+<input type="number" id="expenseAmount" placeholder="Kiadás összege">
+<br>
+<button onclick="saveExpense()">Kivonás</button>
+<button onclick="closeModal('expenseModal')">Mégse</button>
+</div>
+</div>
+ 
+<div class="modal" id="newFolderModal">
+<div class="modal-content">
+<h3>Új persely</h3>
+<input type="text" id="newFolderName" placeholder="Persely neve">
+<input type="number" id="newFolderGoal" placeholder="Cél összeg">
+<br>
+<button onclick="addNewFolder()">Hozzáadás</button>
+<button onclick="closeModal('newFolderModal')">Mégse</button>
+</div>
+</div>
+
+<!-- Main menu page (same size as app) -->
+<div class="card" id="mainMenuPage" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+  <img src="9533819.png" style="width:80px;height:80px;margin-bottom:15px;" alt="Piggy Bank">
+  <h2>Főmenü</h2>
+  <p>Üdvözöllek a Smart Money alkalmazásban.</p>
+  <div class="menu-actions">
+    <button onclick="closeMainMenu()">Megnyitás</button>
+    <button class="secondary" onclick="clearMemory()">Memória ürítése</button>
+  </div>
+  <br>
+  <h5>A Smart Money online persely szolgáltatása az Erste Bank Hungary Zrt. -vel kötött hivatalos partneri megállapodás alapján működik. A szolgáltatás igénybevételével a felhasználó elfogadja az általános szerződési feltételeket és az adatkezelési tájékoztatót.</h5>
+</div>
+
+<!-- Profile page -->
+<div class="card" id="profilePage" style="display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:18px;">
+  <div class="back-button" onclick="closeProfile()" title="Vissza" style="align-self:flex-start;margin-bottom:10px;">←</div>
+  <h2>Profil</h2>
+  <div style="width:100%;padding:0 12px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:100%;display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <input id="profileName" type="text" placeholder="Neved" style="flex:1;padding:8px;border-radius:6px;border:2px solid rgba(0,0,0,0.06);color:#000;background:#fff;" disabled />
+      <button onclick="toggleNameEdit()" id="editNameBtn" style="padding:8px 10px;border-radius:6px;background:linear-gradient(180deg,#FF8DA1 0%, #E67A8F 100%);color:white;font-weight:bold;cursor:pointer;border:2px solid rgba(0,0,0,0.12);">Szerkesztés</button>
+    </div>
+    <div style="width:100%;display:flex;gap:8px;margin-bottom:14px;">
+      <button onclick="saveProfile()" style="flex:1;padding:8px;background:#444;color:white;border:2px solid rgba(0,0,0,0.08);border-radius:6px;cursor:pointer;font-weight:bold;">Mentés</button>
+      <button onclick="openStatistics()" style="flex:1;padding:8px;background:#FF8DA1;color:white;border:2px solid rgba(0,0,0,0.08);border-radius:6px;cursor:pointer;font-weight:bold;">Statisztika</button>
+    </div>
+
+    <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:0 0;">
+      <label style="font-weight:bold;font-size:14px;">Sötét mód</label>
+      <div class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics page -->
+<div class="card" id="statisticsPage" style="display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:18px;">
+  <div class="back-button" onclick="closeStatistics()" title="Vissza" style="align-self:flex-start;margin-bottom:10px;">←</div>
+  <h2>Statisztika</h2>
+  <div style="width:100%;padding:0 12px;display:flex;flex-direction:column;align-items:center;">
+    <h4 style="width:100%;margin:14px 0 8px 0;text-align:left;">Összegek (mappánként)</h4>
+    <canvas id="expensesChart" class="profile-chart" width="280" height="140"></canvas>
+
+    <h4 style="width:100%;margin:14px 0 8px 0;text-align:left;">Kiadások (mappánként)</h4>
+    <canvas id="expenseChartProfile" class="profile-chart" width="280" height="140"></canvas>
+  </div>
+</div>
+<script>
+let balances = {};
+let editing = null;
+
+// Adatok betöltése localStorage/sessionStorage-ből
+function loadBalances() {
+    let storage = localStorage;
+    try {
+        localStorage.setItem('test', '1');
+        localStorage.removeItem('test');
+    } catch (e) {
+        storage = sessionStorage;
+    }
+    
+    const saved = storage.getItem('smartmoney_balances');
+    if (saved) {
+        balances = JSON.parse(saved);
+    } else {
+        balances = {
+            edu: {name: "Tanulás", amount: 62100, allocated: 5000, goal: 100000, expenses: 0, goalReached: false},
+            emerg: {name: "Vészhelyzet", amount: 1, allocated: 0, goal: 5000, expenses: 0, goalReached: false},
+            vac: {name: "Vakáció", amount: 23050, allocated: 0, goal: 50000, expenses: 0, goalReached: false}
+        };
+        saveBalances();
+    }
+}
+
+// Adatok mentése localStorage/sessionStorage-be
+function saveBalances() {
+    let storage = localStorage;
+    try {
+        localStorage.setItem('test', '1');
+        localStorage.removeItem('test');
+    } catch (e) {
+        storage = sessionStorage;
+    }
+    storage.setItem('smartmoney_balances', JSON.stringify(balances));
+}
+ 
+function formatFt(num) {
+    return num.toLocaleString("hu-HU") + " Ft";
+}
+ 
+function calculateTotal() {
+    const folderTotal = Object.values(balances).reduce((sum, f) => sum + f.amount, 0);
+    const available = Object.values(balances).reduce((sum, f) => sum + f.allocated, 0);
+    const totalUploaded = folderTotal + available;
+    document.getElementById("total").innerText = "Feltöltött: " + formatFt(totalUploaded);
+    document.getElementById("remaining").innerText = "Rendelkezésre álló: " + formatFt(available);
+}
+ 
+function renderFolders() {
+    const container = document.getElementById("folders");
+    container.innerHTML = "";
+ 
+    Object.entries(balances).forEach(([key, data]) => {
+        const percent = data.goal > 0 ? Math.min((data.amount / data.goal) * 100, 100) : 0;
+        const exceeded = data.goal > 0 && data.amount > data.goal;
+        const div = document.createElement("div");
+        div.className = "folder";
+        div.innerHTML = `
+<div class="folder-header" style="display:flex;justify-content:space-between;align-items:center;">
+<div style="flex:1;">
+                    💰 <span>${data.name}</span><br>
+<small id="${key}Amount">${formatFt(data.amount)}</small><br>
+<small>Cél: ${data.goal ? formatFt(data.goal) : "nincs megadva"}</small>
+</div>
+<div style="display:flex;gap:6px;align-items:center;">
+<button class="expense-button" style="background:linear-gradient(135deg,#82c8d4 0%, #6ab5c5 100%);width:28px;height:28px;font-size:14px;" onclick="openAllocateModal('${key}')" title="Pénz allokálása">+</button>
+<button class="expense-button" onclick="openExpenseModal('${key}')" title="Kiadás">−</button>
+<button class="expense-button" style="background:linear-gradient(135deg,#ff9a76 0%, #f0805a 100%);" onclick="deleteFolder('${key}')" title="Törlés">🗑</button>
+</div>
+</div>
+<div class="progress-bar"><div class="progress-fill ${exceeded ? 'exceeded' : ''}" style="width:${percent}%;"></div></div>
+        `;
+        container.appendChild(div);
+    });
+ 
+    calculateTotal();
+}
+ 
+function updateFolderSelect() {
+    const select = document.getElementById("folderSelect");
+    select.innerHTML = "";
+    for (const key in balances) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.text = balances[key].name;
+        select.add(option);
+    }
+}
+
+// új funkciók a 'Cél beállítása' gombhoz
+function openSetGoalModal() {
+    const select = document.getElementById('setGoalFolder');
+    select.innerHTML = '';
+    for (const key in balances) {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.text = balances[key].name;
+        select.add(opt);
+    }
+    document.getElementById('setGoalAmount').value = '';
+    document.getElementById('setGoalModal').style.display = 'flex';
+}
+
+function saveSetGoal() {
+    const folder = document.getElementById('setGoalFolder').value;
+    const goal = parseInt(document.getElementById('setGoalAmount').value);
+    if (!folder) return alert('Válassz mappát!');
+    if (isNaN(goal) || goal <= 0) return alert('Adj meg érvényes célösszeget!');
+    balances[folder].goal = goal;
+    balances[folder].goalReached = false;
+    saveBalances();
+    renderFolders();
+    closeModal('setGoalModal');
+}
+
+// Kiadás functiók
+let editingExpense = null;
+
+function openExpenseModal(folder) {
+    editingExpense = folder;
+    document.getElementById('expenseTitle').innerText = balances[folder].name + ' - Kivonás';
+    document.getElementById('expenseAmount').value = '';
+    document.getElementById('expenseModal').style.display = 'flex';
+}
+
+function saveExpense() {
+    const amount = parseInt(document.getElementById('expenseAmount').value);
+    if (!editingExpense) return alert('Válassz mappát!');
+    if (isNaN(amount) || amount < 0) return alert('Adj meg érvényes összeget!');
+    if (balances[editingExpense].amount - amount < 0) return alert('Nincs elegendő egyenleg!');
+    balances[editingExpense].amount -= amount;
+    balances[editingExpense].expenses = (balances[editingExpense].expenses || 0) + amount;
+    saveBalances();
+    renderFolders();
+    drawExpenseChart();
+    closeModal('expenseModal');
+}
+
+// Pénz allokálása mappához
+let allocatingFolder = null;
+
+function openAllocateModal(folder) {
+    allocatingFolder = folder;
+    document.getElementById('allocateTitle').innerText = balances[folder].name + ' - Pénz allokálása';
+    document.getElementById('allocateAmount').value = '';
+    document.getElementById('allocateMoneyModal').style.display = 'flex';
+}
+
+function saveAllocateMoney() {
+    const amount = parseInt(document.getElementById('allocateAmount').value);
+    const totalAvailable = Object.values(balances).reduce((sum, f) => sum + f.allocated, 0);
+    
+    if (!allocatingFolder) return alert('Válassz mappát!');
+    if (isNaN(amount) || amount <= 0) return alert('Adj meg érvényes összeget!');
+    if (amount > totalAvailable) return alert('Nincs elegendő szabad pénz!');
+    
+    balances[allocatingFolder].amount += amount;
+    
+    // Reduce available balance from first folder with allocated
+    let remaining = amount;
+    for (const key in balances) {
+        if (remaining <= 0) break;
+        const deduct = Math.min(remaining, balances[key].allocated);
+        balances[key].allocated -= deduct;
+        remaining -= deduct;
+    }
+    
+    if (balances[allocatingFolder].goal > 0 && balances[allocatingFolder].amount >= balances[allocatingFolder].goal && !balances[allocatingFolder].goalReached) {
+        balances[allocatingFolder].goalReached = true;
+        showNotification(`Elérted a célod a(z) ${balances[allocatingFolder].name} perselyben!`);
+    }
+    
+    saveBalances();
+    renderFolders();
+    closeModal('allocateMoneyModal');
+}
+ 
+function openAddMoneyModal() {
+    document.getElementById("addMoneyModal").style.display = "flex";
+}
+ 
+function addMoney() {
+    const amount = parseInt(document.getElementById("moneyAmount").value);
+    if (isNaN(amount) || amount <= 0) return alert("Adj meg egy érvényes összeget!");
+    
+    // Add to allocated (available/unallocated money)
+    const keys = Object.keys(balances);
+    if (keys.length > 0) {
+        balances[keys[0]].allocated += amount;
+    }
+    
+    saveBalances();
+    renderFolders();
+    closeModal("addMoneyModal");
+}
+
+function showNotification(message) {
+    const notif = document.createElement('div');
+    notif.className = 'notification';
+    notif.innerText = message;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 5000);
+}
+ 
+function openLimitModal(folder) {
+    editing = folder;
+    document.getElementById("limitModal").style.display = "flex";
+}
+ 
+function saveNewLimit() {
+    const newAmount = parseInt(document.getElementById("newLimit").value);
+    if (isNaN(newAmount) || newAmount < 0) return alert("Érvénytelen összeg!");
+    balances[editing].amount = newAmount;
+    saveBalances();
+    renderFolders();
+    closeModal("limitModal");
+}
+ 
+function openGoalModal(folder) {
+    editing = folder;
+    document.getElementById("goalModal").style.display = "flex";
+}
+ 
+function saveGoal() {
+    const newGoal = parseInt(document.getElementById("newGoal").value);
+    if (isNaN(newGoal) || newGoal <= 0) return alert("Adj meg érvényes célösszeget!");
+    balances[editing].goal = newGoal;
+    saveBalances();
+    renderFolders();
+    closeModal("goalModal");
+}
+ 
+function openNewFolderModal() {
+    document.getElementById("newFolderModal").style.display = "flex";
+}
+ 
+function addNewFolder() {
+    const name = document.getElementById("newFolderName").value.trim();
+    const goal = parseInt(document.getElementById("newFolderGoal").value) || 0;
+    if (!name) return alert("Adj meg egy nevet!");
+    const id = name.toLowerCase().replace(/\s+/g, "_") + "_" + Date.now();
+    balances[id] = { name: name, amount: 0, allocated: 0, goal: goal, expenses: 0, goalReached: false };
+    saveBalances();
+    renderFolders();
+    closeModal("newFolderModal");
+}
+
+function deleteFolder(key) {
+    if (confirm(`Biztosan törlöd a "${balances[key].name}" mappát?`)) {
+        delete balances[key];
+        saveBalances();
+        renderFolders();
+    }
+}
+
+function clearMemory() {
+    if (confirm('Biztosan törlöd az összes adatot? Ez nem visszavonható!')) {
+        try {
+            localStorage.clear();
+        } catch (e) {}
+        try {
+            sessionStorage.clear();
+        } catch (e) {}
+        balances = {
+            edu: {name: "Tanulás", amount: 62100, allocated: 5000, goal: 100000, expenses: 0, goalReached: false},
+            emerg: {name: "Vészhelyzet", amount: 1, allocated: 0, goal: 5000, expenses: 0, goalReached: false},
+            vac: {name: "Vakáció", amount: 23050, allocated: 0, goal: 50000, expenses: 0, goalReached: false}
+        };
+        saveBalances();
+        renderFolders();
+        openMainMenu();
+        alert('Az adatok törlésre kerültek és az alapértelmezett értékek visszaállításra kerültek.');
+    }
+}
+ 
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+    document.querySelectorAll(`#${id} input`).forEach(el => el.value = "");
+}
+
+function openMainMenu() {
+    document.getElementById('mainMenuPage').style.display = 'flex';
+    document.getElementById('appPage').style.display = 'none';
+}
+function closeMainMenu() {
+    document.getElementById('mainMenuPage').style.display = 'none';
+    document.getElementById('appPage').style.display = 'block';
+}
+
+// Draw expenses chart on profile
+function drawExpensesChart() {
+    const canvas = document.getElementById('expensesChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const data = Object.entries(balances).map(([k,v]) => ({label: v.name, value: v.amount}));
+    const padding = 20; const w = canvas.width; const h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    const total = data.reduce((s,d) => s + d.value, 0) || 1;
+    const barWidth = (w - padding*2) / data.length * 0.7;
+    const gap = ((w - padding*2) / data.length) - barWidth;
+    const isDark = document.body.classList.contains('dark-mode');
+    const textColor = isDark ? '#c0c0c0' : '#333';
+    data.forEach((d,i)=>{
+        const x = padding + i * (barWidth + gap) + gap/2;
+        const percent = (d.value / total) * 100;
+        const barH = (percent / 100) * (h - padding*2 - 20);
+        const y = h - padding - 20 - barH;
+        const grad = ctx.createLinearGradient(x, y, x+barWidth, y);
+        grad.addColorStop(0, '#FF8DA1'); grad.addColorStop(1, '#E67A8F');
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, y, barWidth, barH);
+        // percentage text
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 9px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(percent.toFixed(0) + '%', x + barWidth/2, y - 3);
+        // label at bottom
+        ctx.font = '10px Segoe UI, sans-serif';
+        ctx.fillText(d.label, x + barWidth/2, h - 6);
+    });
+}
+
+function toggleNameEdit() {
+    const input = document.getElementById('profileName');
+    const btn = document.getElementById('editNameBtn');
+    if (input.disabled) { input.disabled = false; input.focus(); btn.innerText = 'Kész'; }
+    else { input.disabled = true; btn.innerText = 'Szerkesztés'; }
+}
+
+function openProfile() {
+    document.getElementById('profilePage').style.display = 'flex';
+    document.getElementById('appPage').style.display = 'none';
+    document.getElementById('profileName').value = document.getElementById('userName').innerText || '';
+    document.getElementById('profileName').disabled = true;
+    document.getElementById('editNameBtn').innerText = 'Szerkesztés';
+    drawExpensesChart();
+    drawExpenseChart();
+}
+
+function closeProfile() {
+    document.getElementById('profilePage').style.display = 'none';
+    document.getElementById('appPage').style.display = 'block';
+}
+
+function openStatistics() {
+    document.getElementById('statisticsPage').style.display = 'flex';
+    document.getElementById('profilePage').style.display = 'none';
+    drawExpensesChart();
+    drawExpenseChart();
+}
+
+function closeStatistics() {
+    document.getElementById('statisticsPage').style.display = 'none';
+    document.getElementById('profilePage').style.display = 'flex';
+}
+
+function saveProfile() {
+    const name = document.getElementById('profileName').value.trim();
+    if (name) document.getElementById('userName').innerText = name;
+    closeProfile();
+}
+
+// Draw expense chart - kiadások
+function drawExpenseChart() {
+    const canvas = document.getElementById('expenseChartProfile');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const data = Object.entries(balances).map(([k,v]) => ({label: v.name, value: v.expenses || 0}));
+    const padding = 20; const w = canvas.width; const h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    const total = data.reduce((s,d) => s + d.value, 0) || 1;
+    const barWidth = (w - padding*2) / data.length * 0.7;
+    const gap = ((w - padding*2) / data.length) - barWidth;
+    const isDark = document.body.classList.contains('dark-mode');
+    const textColor = isDark ? '#c0c0c0' : '#333';
+    data.forEach((d,i)=>{
+        const x = padding + i * (barWidth + gap) + gap/2;
+        const percent = total > 0 ? (d.value / total) * 100 : 0;
+        const barH = (percent / 100) * (h - padding*2 - 20);
+        const y = h - padding - 20 - barH;
+        const grad = ctx.createLinearGradient(x, y, x+barWidth, y);
+        grad.addColorStop(0, '#ff6b6b'); grad.addColorStop(1, '#ee5a6f');
+        ctx.fillStyle = grad;
+        ctx.fillRect(x, y, barWidth, barH);
+        // percentage text
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 9px Segoe UI, sans-serif';
+        ctx.textAlign = 'center';
+        if (barH > 5) ctx.fillText(percent.toFixed(0) + '%', x + barWidth/2, y - 3);
+        // label at bottom
+        ctx.font = '10px Segoe UI, sans-serif';
+        ctx.fillText(d.label, x + barWidth/2, h - 6);
+    });
+}
+
+// show main menu on load
+loadBalances();
+renderFolders();
+openMainMenu();
+
+// Dark mode functions
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    const toggle = document.getElementById('darkModeToggle');
+    toggle.classList.toggle('active');
+    let storage = localStorage;
+    try {
+        localStorage.setItem('test', '1');
+        localStorage.removeItem('test');
+    } catch (e) {
+        storage = sessionStorage;
+    }
+    storage.setItem('smartmoney_darkmode', document.body.classList.contains('dark-mode'));
+    // Redraw charts with new color
+    drawExpensesChart();
+    drawExpenseChart();
+}
+
+function loadDarkMode() {
+    let storage = localStorage;
+    try {
+        localStorage.setItem('test', '1');
+        localStorage.removeItem('test');
+    } catch (e) {
+        storage = sessionStorage;
+    }
+    const isDarkMode = storage.getItem('smartmoney_darkmode') === 'true';
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        const toggle = document.getElementById('darkModeToggle');
+        if (toggle) toggle.classList.add('active');
+    }
+}
+
+// Load dark mode on page start
+loadDarkMode();
+
+// Multiple shooting stars
+function createShootingStar() {
+    const star = document.createElement('div');
+    star.style.position = 'fixed';
+    star.style.width = '4px';
+    star.style.height = '4px';
+    star.style.background = document.body.classList.contains('dark-mode') 
+        ? 'radial-gradient(circle, #aaa, rgba(170,170,170,0.5))'
+        : 'radial-gradient(circle, #fff, rgba(255,255,255,0.5))';
+    star.style.borderRadius = '50%';
+    star.style.boxShadow = document.body.classList.contains('dark-mode')
+        ? '0 0 6px rgba(170,170,170,0.8)'
+        : '0 0 6px rgba(255,255,255,0.8)';
+    star.style.top = '-50px';
+    star.style.left = Math.random() * window.innerWidth + 'px';
+    star.style.animation = `shootingStar ${2 + Math.random() * 2}s ease-in forwards`;
+    star.style.pointerEvents = 'none';
+    star.style.zIndex = '-1';
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 4000);
+}
+setInterval(createShootingStar, 1000);
+</script>
+
+</body>
+</html>
